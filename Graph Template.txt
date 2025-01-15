@@ -71,3 +71,65 @@ public class DSU {
 
 
 
+
+#Kruskal 
+
+
+
+public class DSU {
+        private int[] parent, rank;
+
+        public DSU(int n) {
+            parent = new int[n];
+            rank = new int[n];
+            for (int i = 0; i < n; i++) {
+                parent[i] = i;
+                rank[i] = 0;
+            }
+        }
+
+        public int find(int x) {
+            if (parent[x] != x) {
+                parent[x] = find(parent[x]); // Path compression
+            }
+            return parent[x];
+        }
+
+        public void union(int x, int y) {
+            int rootX = find(x);
+            int rootY = find(y);
+            if (rootX != rootY) {
+                if (rank[rootX] > rank[rootY]) {
+                    parent[rootY] = rootX;
+                } else if (rank[rootX] < rank[rootY]) {
+                    parent[rootX] = rootY;
+                } else {
+                    parent[rootY] = rootX;
+                    rank[rootX]++;
+                }
+            }
+        }
+    }
+
+
+    public int kruskal(int[][] edges) {
+        DSU dsu = new DSU(num);
+        int totalWeight = 0;
+        int edgesConnected = 0;
+
+        
+
+        // Process all edges except the skipped one
+        for (int i = 0; i < edges.length; i++) {
+            int[] edge = edges[i];
+            if (uf.union(edge[0], edge[1])) {
+                totalWeight += edge[2];
+                edgesConnected++;
+            }
+        }
+
+        // Check if all vertices are connected (N-1 edges in the MST)
+        return (edgesConnected == N - 1) ? totalWeight : Integer.MAX_VALUE;
+    }
+
+
