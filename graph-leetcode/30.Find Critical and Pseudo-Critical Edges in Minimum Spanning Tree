@@ -1,0 +1,116 @@
+/*
+ we will apply Kruskal Algo to find the MST
+ now once we got we will try to remove every edge and see if on removing this edge the weight increas
+ for critical edge
+ and if it remains same then it will be pseudo critical
+*/
+
+class Solution {
+    int N;
+
+    // UnionFind class
+    class UnionFind {
+        int[] parent;
+        int[] rank;
+
+        public UnionFind(int n) {
+            parent = new int[n];
+            rank = new int[n];
+            for (int i = 0; i < n; i++) {
+                parent[i] = i;
+                rank[i] = 0;
+            }
+        }
+
+        public int find(int x) {
+            if (x != parent[x]) {
+                parent[x] = find(parent[x]);
+            }
+            return parent[x];
+        }
+
+        public boolean union(int x, int y) {
+            int rootX = find(x);
+            int rootY = find(y);
+
+            if (rootX == rootY) {
+                return false;
+            }
+
+            if (rank[rootX] > rank[rootY]) {
+                parent[rootY] = rootX;
+            } else if (rank[rootX] < rank[rootY]) {
+                parent[rootX] = rootY;
+            } else {
+                parent[rootX] = rootY;
+                rank[rootY]++;
+            }
+            return true;
+        }
+    }
+
+    public int kruskal(int[][] edges, int skipEdge, int addEdge) {
+        UnionFind uf = new UnionFind(N);
+        int totalWeight = 0;
+        int edgesConnected = 0;
+
+        // Force add a specific edge if required
+        if (addEdge != -1) {
+            int[] edge = edges[addEdge];
+            uf.union(edge[0], edge[1]);
+            totalWeight += edge[2];
+            edgesConnected++;
+        }
+
+        // Process all edges except the skipped one
+        for (int i = 0; i < edges.length; i++) {
+            if (i == skipEdge) continue;
+
+            int[] edge = edges[i];
+            if (uf.union(edge[0], edge[1])) {
+                totalWeight += edge[2];
+                edgesConnected++;
+            }
+        }
+
+        // Check if all vertices are connected (N-1 edges in the MST)
+        return (edgesConnected == N - 1) ? totalWeight : Integer.MAX_VALUE;
+    }
+
+    public List<List<Integer>> findCriticalAndPseudoCriticalEdges(int n, int[][] edges) {
+        N = n;
+
+        // Add original indices to edges
+        int m = edges.length;
+        int[][] newEdges = new int[m][4];
+        for (int i = 0; i < m; i++) {
+            System.arraycopy(edges[i], 0, newEdges[i], 0, 3);
+            newEdges[i][3] = i; // Original index
+        }
+
+        // Sort edges by weight
+        Arrays.sort(newEdges, Comparator.comparingInt(e -> e[2]));
+
+        // Calculate the MST weight using Kruskal's without skipping or forcing any edge
+        int mstWeight = kruskal(newEdges, -1, -1);
+
+        List<List<Integer>> result = new ArrayList<>();
+        result.add(new ArrayList<>()); // Critical edges
+        result.add(new ArrayList<>()); // Pseudo-critical edges
+
+        // Analyze each edge for criticality and pseudo-criticality
+        for (int i = 0; i < m; i++) {
+            // Check if the edge is critical
+            if (kruskal(newEdges, i, -1) > mstWeight) {
+                result.get(0).add(newEdges[i][3]);
+            }
+            // Check if the edge is pseudo-critical
+            else if (kruskal(newEdges, -1, i) == mstWeight) {
+                result.get(1).add(newEdges[i][3]);
+            }
+        }
+
+        return result;
+    }
+
+}

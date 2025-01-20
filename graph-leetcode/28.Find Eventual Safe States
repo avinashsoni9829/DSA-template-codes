@@ -1,0 +1,45 @@
+/*
+We can Apply Cycle Detection DFS logic in Directed graph
+*/
+
+class Solution {
+
+    private boolean dfsCycle(int [][] g , int node , boolean [] vis , boolean [] inRecursion){
+         vis[node] = true;
+         inRecursion[node] = true;
+
+         for(int child : g[node]){
+             if(!vis[child] && dfsCycle(g,child,vis,inRecursion)){
+                 return true;
+             }
+             else if(inRecursion[child] == true){
+                return true;
+             }
+         }
+
+         inRecursion[node] = false;
+         return false;
+    }
+    public List<Integer> eventualSafeNodes(int[][] graph) {
+         int n = graph.length;
+         boolean [] vis = new boolean[n];
+         boolean [] inRecursion = new boolean[n];
+
+         for(int i = 0 ; i < n ; ++i){
+             if(!vis[i]){
+               dfsCycle(graph,i,vis,inRecursion);
+             }
+         }
+
+         List<Integer> safe = new ArrayList<>();
+
+         for(int i = 0 ; i < n ; ++i ){
+             if(inRecursion[i] == false) {
+                 safe.add(i);
+             }
+         }
+         return safe;
+
+
+    }
+}

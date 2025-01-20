@@ -1,0 +1,78 @@
+/*
+  We need to create graph [directed]
+  we can check if two bomb points are connected if one lies in the circle range of each.
+  other
+
+  so we will simply see if two bomb points can connect or not
+  then we will create graph
+  once graph is done we will go to each node and see the count of values it can visit
+  and find the maxm ans
+ */
+
+class Solution {
+    class Circle {
+        private int x;
+        private int y;
+        private int r;
+
+        public Circle(int[] data) {
+            this.x = data[0];
+            this.y = data[1];
+            this.r = data[2];
+        }
+
+        public boolean canBomb(Circle child) {
+            return (long) this.r * this.r >= calculateDistanceSquared(this, child);
+        }
+
+        private long calculateDistanceSquared(Circle c1, Circle c2) {
+            long dx = (long) c2.x - c1.x;
+            long dy = (long) c2.y - c1.y;
+            return dx * dx + dy * dy;
+        }
+    }
+
+    private void dfs(int node, Map<Integer, List<Integer>> graph, boolean[] visited) {
+        visited[node] = true;
+        for (int neighbor : graph.getOrDefault(node, new ArrayList<>())) {
+            if (!visited[neighbor]) {
+                dfs(neighbor, graph, visited);
+            }
+        }
+    }
+
+    public int maximumDetonation(int[][] bombs) {
+        int n = bombs.length;
+        Map<Integer, List<Integer>> graph = new HashMap<>();
+        Circle[] circles = new Circle[n];
+
+        // Precompute Circle objects
+        for (int i = 0; i < n; i++) {
+            circles[i] = new Circle(bombs[i]);
+        }
+
+        // Build the graph
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i != j && circles[i].canBomb(circles[j])) {
+                    graph.computeIfAbsent(i, k -> new ArrayList<>()).add(j);
+                }
+            }
+        }
+
+        // Find the maximum number of detonations
+        int maxDetonations = 0;
+        for (int i = 0; i < n; i++) {
+            boolean[] visited = new boolean[n];
+            dfs(i, graph, visited);
+
+            int count = 0;
+            for (boolean visit : visited) {
+                if (visit) count++;
+            }
+            maxDetonations = Math.max(maxDetonations, count);
+        }
+
+        return maxDetonations;
+    }
+}

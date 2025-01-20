@@ -1,0 +1,51 @@
+/*
+ Dono node se saare nodes ka distance nikal lenge
+ uske baad jo bhi aaye usme us node se jaane ke max distance nikal ke uska minimum le lenge
+Done BFS + DFS se ho jaayega
+*/
+
+class Solution {
+    int n;
+     private void dfs(int[] edges, int node, List<Integer> dist, boolean[] vis) {
+        vis[node] = true;
+        int v = edges[node];
+        if (v != -1 && !vis[v]) {
+            dist.set(v, 1 + dist.get(node));
+            dfs(edges, v, dist, vis);
+        }
+    }
+    public int closestMeetingNode(int[] edges, int node1, int node2) {
+         n = edges.length;
+        List<Integer> dist1 = new ArrayList<>(Collections.nCopies(n, Integer.MAX_VALUE));
+        List<Integer> dist2 = new ArrayList<>(Collections.nCopies(n, Integer.MAX_VALUE));
+
+         boolean [] vis1 = new boolean[n];
+         boolean [] vis2 = new boolean[n];
+
+         dist1.set(node1,0);
+         dist2.set(node2,0);
+
+         dfs(edges,node1,dist1,vis1);
+         dfs(edges,node2,dist2,vis2);
+
+         int ans = -1;
+         int min = Integer.MAX_VALUE;
+
+         for (int i = 0; i < n; i++) {
+            if (dist1.get(i) != Integer.MAX_VALUE && dist2.get(i) != Integer.MAX_VALUE) {
+                int mx = Math.max(dist1.get(i), dist2.get(i));
+                if (mx < min) {
+                    min = mx;
+                    ans = i;
+                } else if (mx == min && i < ans) {
+                    // In case of ties, choose the smallest index
+                    ans = i;
+                }
+            }
+        }
+
+         return ans;
+
+
+    }
+}

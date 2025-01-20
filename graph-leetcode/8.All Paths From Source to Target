@@ -1,0 +1,41 @@
+import java.util.ArrayList;
+import java.util.List;
+
+class Solution {
+    // List to store all paths
+    List<List<Integer>> ans = new ArrayList<>();
+    // List to store the current path
+    List<Integer> curr = new ArrayList<>();
+
+    // DFS method to explore paths
+    private void dfs(int node, int n, int[][] graph, boolean[] vis) {
+        // Add the current node to the current path
+        curr.add(node);
+        // Mark the current node as visited
+        vis[node] = true;
+
+        // If we reached the last node, add the current path to the answer
+        if (node == n - 1) {
+            ans.add(new ArrayList<>(curr)); // Add a copy of curr to ans
+        } else {
+            // Visit all neighbors of the current node
+            for (int neighbor : graph[node]) {
+                if (!vis[neighbor]) {
+                    dfs(neighbor, n, graph, vis);
+                }
+            }
+        }
+
+        // Backtrack: remove the current node from the path and mark it as unvisited
+        curr.remove(curr.size() - 1);
+        vis[node] = false;
+    }
+
+    public List<List<Integer>> allPathsSourceTarget(int[][] graph) {
+        int n = graph.length;
+        boolean[] vis = new boolean[n];
+        // Start DFS from the source node (0)
+        dfs(0, n, graph, vis);
+        return ans;
+    }
+}

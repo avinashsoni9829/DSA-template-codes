@@ -1,0 +1,130 @@
+/*
+ DSU :
+ Step 1: Sort the Edges On basis of edge type
+ we will traverse Typ3 so it handles for both alice and bob
+ now once added we need to go and see if components in dsu are 1 for both
+
+
+ ex :
+
+ [3,1,2] [3,2,3] [1,1,3] [1,2,4] [1,1,2] [2,3,4]
+
+ I. Type = 3
+ 1 - 2
+
+ Alice  : Component = 4
+
+ 1 - 2 = P = 1 , comp = 3
+ 2 - 3 = P = 1 , comp = 2
+ 1 - 3 = No need
+ 2 - 4 = P = 1 , comp = 1
+ 1 - 2  = No need
+
+ Bob : Component =  4
+
+
+ 1 -2 = P = 1 , comp = 3
+ 2 - 3 = P = 1 , comp = 2
+ 3 - 4 = P = 1 , comp = 1
+
+ ===
+ No need = 2
+ Comp alice = 1
+ Comp bob = 1
+ hence ans = 2
+
+
+
+
+*/
+
+class Solution {
+    public class DSU {
+        private int[] parent, rank;
+
+        public DSU(int n) {
+            parent = new int[n];
+            rank = new int[n];
+            for (int i = 0; i < n; i++) {
+                parent[i] = i;
+                rank[i] = 0;
+            }
+        }
+
+        public int find(int x) {
+            if (parent[x] != x) {
+                parent[x] = find(parent[x]); // Path compression
+            }
+            return parent[x];
+        }
+
+        public boolean union(int x, int y) {
+            int rootX = find(x);
+            int rootY = find(y);
+            if (rootX != rootY) {
+                if (rank[rootX] > rank[rootY]) {
+                    parent[rootY] = rootX;
+                } else if (rank[rootX] < rank[rootY]) {
+                    parent[rootX] = rootY;
+                } else {
+                    parent[rootY] = rootX;
+                    rank[rootX]++;
+                }
+                return true;
+            }
+            return false;
+        }
+    }
+
+    public int maxNumEdgesToRemove(int n, int[][] edges) {
+        DSU alice = new DSU(n);
+        DSU bob = new DSU(n);
+
+        int compAlice = n;
+        int compBob = n;
+        int remove = 0;
+
+        for (int[] e : edges) {
+            int type = e[0];
+            int u = e[1] - 1;
+            int v = e[2] - 1;
+
+            if (type == 3) {
+                boolean addedAlice = alice.union(u, v);
+                boolean addedBob = bob.union(u, v);
+
+                if (addedAlice) {
+                    compAlice--;
+                }
+                if (addedBob) {
+                    compBob--;
+                }
+                if (!addedAlice && !addedBob) {
+                    remove++;
+                }
+            }
+        }
+
+        for (int[] e : edges) {
+            int type = e[0];
+            int u = e[1] - 1;
+            int v = e[2] - 1;
+
+            if (type == 2) {
+                if (!bob.union(u, v)) {
+                    remove++;
+                } else {
+                    compBob--;
+                }
+            } else if (type == 1) {
+                if (!alice.union(u, v)) {
+                    remove++;
+                } else {
+                    compAlice--;
+                }
+            }
+        }
+
+        return (compAlice == 1 && compBob == 1) ? remove : -1;
+    }
+}

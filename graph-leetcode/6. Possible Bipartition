@@ -1,0 +1,75 @@
+class Solution {
+    /*
+       Bi-partite check :
+
+
+    */
+    private boolean dfs(Map<Integer,List<Integer>> g, int [] color , int node)
+    {
+         // Do a BFS now
+
+         Queue<Integer> q = new LinkedList<>();
+         q.offer(node);
+         color[node] = 1;
+         //1 => red
+         // 0 -> green
+
+         while(!q.isEmpty())
+         {
+             int top = q.poll();
+
+             for(int child : g.getOrDefault(top , new ArrayList<>()))
+             {
+                // cannot be bipartitie
+                 if(color[child] == color[top]) return false;
+                 if(color[child] == -1){
+                      color [child] = 1 - color[top];
+                      q.offer(child);
+                 }
+
+
+
+             }
+         }
+
+         return true;
+    }
+    private boolean checkBipartite(Map<Integer,List<Integer>> g , int n)
+    {
+         // colour array
+
+         int [] color = new int[n + 1];
+         for(int i = 0 ; i < n + 1 ; ++i){
+             color[i] = -1;
+         }
+
+         for(int i = 1 ; i <= n ; ++i)
+         {
+             if(color[i] == -1 && !dfs(g , color , i)){ // not yet visited
+                 return false;
+             }
+         }
+
+         return true;
+    }
+    public boolean possibleBipartition(int n, int[][] dislikes) {
+
+        // create graph first
+        Map<Integer,List<Integer>> g = new HashMap<>();
+
+        int m = dislikes.length;
+
+        for(int i = 0 ; i < m ; ++i)
+        {
+             int u = dislikes[i][0];
+             int v = dislikes[i][1];
+
+             g.computeIfAbsent(u,k -> new ArrayList<>()).add(v);
+              g.computeIfAbsent(v,k -> new ArrayList<>()).add(u);
+        }
+
+        // now we just need to check if this graph can be bipartite or not
+
+        return checkBipartite(g, n);
+    }
+}

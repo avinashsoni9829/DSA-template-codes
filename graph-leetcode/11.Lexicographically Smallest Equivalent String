@@ -1,0 +1,55 @@
+class Solution {
+    /*
+
+     We will create the graph and will interate over baseStr to find the minimum replacement
+     and then swap
+     t:c -> O(baseStr.length * s1.length)
+
+
+    */
+    private int dfs(Map<Integer,List<Integer>>g,int node,HashSet<Integer>seen,int mn){
+        seen.add(node);
+        mn = Math.min(mn,node);
+         for(int child : g.getOrDefault(node , new ArrayList<>())){
+             if(!seen.contains(child)){
+                mn = Math.min(mn,dfs(g,child,seen,mn));
+
+             }
+         }
+
+         return mn;
+    }
+    public String smallestEquivalentString(String s1, String s2, String baseStr) {
+        int n = s1.length();
+        int m = baseStr.length();
+
+        Map<Integer,List<Integer>> g = new HashMap<>();
+
+        for(int i = 0 ; i < n ; ++i){
+            char u = s1.charAt(i);
+            char v = s2.charAt(i);
+            int uu = u - 'a';
+            int vv = v - 'a';
+
+            g.computeIfAbsent(uu, k-> new ArrayList<>()).add(vv);
+            g.computeIfAbsent(vv , k -> new ArrayList<>()).add(uu);
+
+        }
+
+        // graph is create now iterate over base str and find the best replacement for it
+
+        char [] chars = baseStr.toCharArray();
+
+        for(int i = 0 ; i < m ; ++i)
+        {
+             char ch = chars[i];
+             int ieq = ch - 'a';
+             int mnrep = dfs(g,ieq,new HashSet<>(),ieq);
+             char cheq  =  (char) (mnrep + 'a');
+             chars[i] = cheq;
+        }
+
+        return new String(chars);
+
+    }
+}

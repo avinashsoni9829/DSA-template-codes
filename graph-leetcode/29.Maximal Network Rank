@@ -1,0 +1,38 @@
+/*
+
+ if two edges have a common edge then ans is sizea+sizeb-1;
+
+*/
+class Solution {
+    public int maximalNetworkRank(int n, int[][] roads) {
+        if(roads.length == 0)return 0;
+
+        Map<Integer,List<Integer>>g = new HashMap<>();
+
+        for(int i = 0 ; i < roads.length ; ++i){
+            int [] r = roads[i];
+             int u = r[0];
+             int v = r[1];
+
+             g.computeIfAbsent(u,k->new ArrayList<>()).add(v);
+             g.computeIfAbsent(v,k->new ArrayList<>()).add(u);
+        }
+
+        int mxRank = 0;
+
+        for(int i = 0 ; i < n ; ++i){
+             for(int j = i + 1 ; j < n ; ++j){
+
+
+                  int rnk = g.getOrDefault(i,new ArrayList<>()).size() + g.getOrDefault(j,new ArrayList<>()).size();
+                  if(g.getOrDefault(i,new ArrayList<>()).contains(j)){
+                     rnk-=1;
+                  }
+                 mxRank = Math.max(mxRank,rnk);
+             }
+
+        }
+
+        return mxRank;
+    }
+}

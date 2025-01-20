@@ -1,0 +1,55 @@
+import java.util.*;
+
+class Solution {
+    private int result;
+
+    private int DFS(Map<Integer, List<Integer>> adj, int curr, int parent, String s) {
+        int longest = 0;
+        int secondLongest = 0;
+
+        for (int child : adj.getOrDefault(curr, new ArrayList<>())){
+            if (child == parent) continue; // Skip the parent node.
+
+            int childLongestLength = DFS(adj, child, curr, s);
+
+            if (s.charAt(child) == s.charAt(curr)) continue; // Skip if the characters are the same.
+
+            if (childLongestLength > secondLongest) {
+                secondLongest = childLongestLength;
+            }
+
+            if (secondLongest > longest) {
+                // Swap longest and secondLongest.
+                int temp = longest;
+                longest = secondLongest;
+                secondLongest = temp;
+            }
+        }
+
+        int koiEkAcha = Math.max(longest, secondLongest) + 1; // Include the current node itself.
+        int onlyRootAcha = 1; // Only the current node is valid if children have duplicate characters.
+        int neecheHiMilgayaAnswer = longest + secondLongest + 1;
+
+        result = Math.max(result, Math.max(neecheHiMilgayaAnswer, Math.max(koiEkAcha, onlyRootAcha)));
+
+        return Math.max(koiEkAcha, onlyRootAcha);
+    }
+
+    public int longestPath(int[] parent, String s) {
+        int n = parent.length;
+        result = 0;
+        Map<Integer, List<Integer>> adj = new HashMap<>();
+
+        // Build the adjacency list for the tree.
+        for (int i = 1; i < n; i++) {
+            int u = i;
+            int v = parent[i];
+            adj.computeIfAbsent(u, k -> new ArrayList<>()).add(v);
+            adj.computeIfAbsent(v, k -> new ArrayList<>()).add(u);
+        }
+
+        DFS(adj, 0, -1, s);
+
+        return result;
+    }
+}

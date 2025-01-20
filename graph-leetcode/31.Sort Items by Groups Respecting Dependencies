@@ -1,0 +1,111 @@
+/*
+ Topo Sort :
+
+Step 1 : Assign Groups to the Ones Whoose group is -1;
+
+Step 2 : make the itemgraph and the indegree
+
+Step 3 : make the group graph and the indegree
+
+Step 4 : Filling the Graphs and Indegree as well for both item graph and group graphs
+
+Step 5 : Do the call to Topological Sort to find it for both of the graph
+
+Step 6 : Create the final Ans
+*/
+
+
+class Solution {
+  private List<Integer> topoSort(Map<Integer, List<Integer>> adj, int[] indegree) {
+
+        Queue<Integer> que = new LinkedList<>();
+        for (int i = 0;i<indegree.length;i++) {
+            if (indegree[i] == 0) {
+                que.add(i);
+            }
+        }
+
+        List<Integer> result = new ArrayList<>();
+        while (!que.isEmpty()) {
+            Integer curr = que.remove();
+            result.add(curr);
+
+            for (Integer v : adj.get(curr)) {
+                indegree[v]--;
+
+                if (indegree[v] == 0) {
+                    que.add(v);
+                }
+            }
+        }
+
+        return result.size() == adj.size() ? result : new ArrayList<>();
+    }
+    public int[] sortItems(int n, int m, int[] group, List<List<Integer>> beforeItems) {
+
+      // Step 1: Group Assignment
+
+      for(int i = 0 ;  i < n ; ++i)
+      {
+         if(group[i] == -1){
+             group[i] = m++;
+         }
+      }
+
+      // Step 2 : Make the Item Graph and the Indegree
+
+      Map<Integer,List<Integer>> itemGraph = new HashMap<>();
+      for (int i = 0; i < n; ++i) {
+            itemGraph.put(i, new ArrayList<>());
+      }
+      int [] itemIndegree = new int[n];
+
+      //Step 3 : Make the Group Graph
+       Map<Integer,List<Integer>> groupGraph = new HashMap<>();
+       for (int i = 0; i < m; ++i) {
+            groupGraph.put(i, new ArrayList<>());
+        }
+      int [] groupIndegree = new int[m];
+
+      // Step 4 : Filling the Graphs
+      for(int i = 0 ; i < n ; ++i){
+         for(int prev : beforeItems.get(i)){
+
+             // before prev aana chahiye to topo ke hisab se pehle prev aayega.
+             // phir current element aayega
+             itemGraph.computeIfAbsent(prev,k -> new ArrayList<>()).add(i);
+             itemIndegree[i]++;
+
+             // group me agar prev and curr same nai to pehle prev ka group aayega
+             // uske baad naya aayega taki before items wale relation maintain rhe
+
+             if(group[i]!=group[prev]){
+                 groupGraph.computeIfAbsent(group[prev],k->new ArrayList<>()).add(group[i]);
+                 groupIndegree[group[i]]++;
+             }
+         }
+      }
+
+     // Step 5 : Topo Call
+
+     List<Integer> itemTopo = topoSort(itemGraph,itemIndegree);
+     List<Integer> groupTopo = topoSort(groupGraph,groupIndegree);
+
+
+     // Step 6 : Create final Ans :
+     Map<Integer,List<Integer>> groupHandler = new HashMap<>();
+     for(int item : itemTopo){
+         int grup = group[item];
+         groupHandler.computeIfAbsent(grup,k->new ArrayList<>()).add(item);
+     }
+
+     List<Integer> answerList = new ArrayList<>();
+        for (int groupIndex : groupTopo) {
+            answerList.addAll(groupHandler.getOrDefault(groupIndex, new ArrayList<>()));
+        }
+
+     return answerList.stream().mapToInt(Integer::intValue).toArray();
+
+
+    }
+}

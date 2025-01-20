@@ -1,0 +1,128 @@
+class Solution {
+    /*
+     * String --> String + Min = BFS Qn
+     * Sab Char me A C G T daal ke dekhege Start Gene me
+     * and check in BANK
+     *
+     * A A A A A C C C -> A A C C C C C C
+     * Bank :
+     * A A A A C C C C
+     * A A A C C C C C
+     * A A C C C C C C
+     *
+     * =================
+     *
+     * BFS Level 1 :
+     *
+     * A A A A A A C C -> not in Bank [ replace by A]
+     * A A A A A C A C -> not in bank [ replace by A]
+     * A A A A A C C A -> not in bank [ replace by A]
+     * C A A A A C C C -> not in bank [ replace by C]
+     * A C A A A C C C -> not in bank [ replace by C]
+     * A A C A A C C C -> not in bank [ replace by C]
+     * A A A C A C C C -> not in bank [ replace by C]
+     * A A A A C C C C -> found in BANK [BFS LEVEL 1 DONE]
+     * BFS Level 2 :
+     * A A A C C C C C -> [replace BY C]
+     * BFS Level 3 :
+     * A A C C C C C C -> replace by C [level = 3 ] [end reached ]
+     *
+     * minsteps = 3
+     *
+     *
+     * Queue : ["AAAAACCC"]
+     * pop = AAAAACCC -> mark as visited
+     * A C G T --> replace each and try
+     * if found push to queue
+     * we find first A A A A C C C C -> push to queue
+     *
+     * Queue = ["AAAACCCC"] [level - 1 done]
+     *
+     * POP = AAAACCCC
+     * replace and try
+     * AAACCCCC -> push to queue -> mark as visited
+     * queue = ["AAACCCCC"]
+     *
+     * POP = "AAACCCCC"
+     * replace and try
+     * AACCCCCC -> not visited and end
+     * so ans --> 3
+     *
+     *
+     *  Time Complexity : O(m ^ n * m * n)
+     *  m = no of chars to be replaced
+        n = char length
+
+         Space Complexity :
+         O(S + m^ n)
+         S =set
+     *
+     *
+     */
+    public int minMutation(String startGene, String endGene, String[] bank) {
+        Set<String> visited = new HashSet<>();
+        Set<String> validGenes = new HashSet<>(Arrays.asList(bank));
+        // if end is not in bank send -1
+        if (!validGenes.contains(endGene)) {
+            return -1;
+        }
+
+        char[] chars = { 'A', 'C', 'G', 'T' };
+        Queue<String> queue = new LinkedList<>();
+        queue.offer(startGene);
+        visited.add(startGene);
+
+        int minSteps = 0;
+
+        while (!queue.isEmpty()) {
+            // size is needed as in prev level multiple choices could be added in queue
+            int size = queue.size();
+            for (int i = 0; i < size; i++) {
+                // fetch the current gene
+                String currentGene = queue.poll();
+                // if equal to the end gene.
+                if (currentGene.equals(endGene)) {
+                    return minSteps;
+                }
+                // convert current to the char array
+                // start replacing and checking.
+                char[] geneArray = currentGene.toCharArray();
+
+                for (int j = 0; j < geneArray.length; j++) {
+                    // for replacement in the end
+                    char originalChar = geneArray[j];
+
+                    for (char c : chars) {
+
+                        if (c == originalChar)
+                            continue;
+
+                        geneArray[j] = c; // replace.
+
+                        String mutatedGene = new String(geneArray); // check new string
+
+                        // if current mutation change in bank and not visited
+                        // add to queue
+                        // mark as visited
+
+                        if (validGenes.contains(mutatedGene) && !visited.contains(mutatedGene)) {
+                            queue.offer(mutatedGene);
+                            visited.add(mutatedGene);
+                        }
+
+                        // replace back with original char
+                        geneArray[j] = originalChar;
+
+                    }
+
+                }
+
+            }
+            minSteps++;
+        }
+
+        return -1;
+
+    }
+
+}

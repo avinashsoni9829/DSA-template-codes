@@ -1,0 +1,87 @@
+class Solution {
+    /*
+         Pehle to 0 Root ka Ans Nikal Lo
+         ab any Child ka Ans = Ans[P] + n - (size of subtree of child)
+         using re rooting logic
+
+         to Double DFS calls honge
+         1. To find ans for Root 0
+         2. To calculate Subtree of the Nodes
+
+         Isse Saare Ans Me Store Ho Jaayege
+
+         Time Complexity : O(n)
+         Space Complexity : O(n)
+
+    */
+
+   int [] ans;  // final ans
+   int [] subtree;  // subtree size
+   ArrayList<HashSet<Integer>>tree;  // graph
+   int num; // n size count
+
+    public int[] sumOfDistancesInTree(int n, int[][] edges) {
+        // reinitialization
+        tree = new ArrayList<HashSet<Integer>>();
+        ans = new int[n];
+        subtree = new int[n];
+        num = n;
+
+        for(int i = 0 ; i < n ; ++i)
+        {
+             tree.add(new HashSet<Integer>());
+        }
+        // graph creation
+        for(int [] e : edges)
+        {
+             tree.get(e[0]).add(e[1]);
+             tree.get(e[1]).add(e[0]);
+        }
+        // first dfs to find the ans for 0
+        dfs1(0,new HashSet<Integer>());
+        // next dfs to use re root logic to find the ans for the childrens
+        dfs2(0,new HashSet<Integer>());
+
+        return ans;
+    }
+
+    private void dfs1(int root , HashSet<Integer> seen)
+    {
+        // mark the node as visited
+
+        seen.add(root);
+         // go to all the child of the node
+         for(int c : tree.get(root))
+         {
+             if(!seen.contains(c)){
+
+                // call the dfs on the child
+                 dfs1(c,seen);
+                 // subtree size of root += subtree size of the child
+                 subtree[root]+=subtree[c];
+
+
+
+                 // ans of the root contains the ans of the child + subtree size of the child
+                 ans[root]+= ans[c] + subtree[c];
+
+             }
+         }
+         // keep incrementing the subtree size of the root
+         subtree[root]++;
+    }
+
+    private void dfs2(int root , HashSet<Integer>seen){
+         seen.add(root);
+
+         for(int c : tree.get(root)){
+             if(!seen.contains(c)){
+                // re root logic
+                // ans[child] = ans[parent] + num - 2 * (subtree size of child)
+                 ans[c] = ans[root] + num - 2 * subtree[c];
+                 dfs2(c,seen);
+             }
+         }
+    }
+
+}

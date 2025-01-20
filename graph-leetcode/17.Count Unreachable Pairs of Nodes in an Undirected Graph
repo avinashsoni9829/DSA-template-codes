@@ -1,0 +1,52 @@
+/*
+ do a DFS ans find the size of the connected component then all u need to do is
+ find combinations
+*/
+
+class Solution {
+    long  size = 0;
+    private void dfs(int node ,Map<Integer,List<Integer>> g,boolean [] vis )
+    {
+        vis[node] = true;
+         size+=1;
+        for(int c : g.getOrDefault(node , new ArrayList<>())){
+             if(!vis[c]){
+
+                dfs(c,g,vis);
+             }
+        }
+    }
+
+    public long countPairs(int n, int[][] edges) {
+        Map<Integer,List<Integer>> g = new HashMap<>();
+        // graph creation
+        for(int [] e : edges)
+        {
+              int u = e[0];
+              int v = e[1];
+              g.computeIfAbsent(u,k-> new ArrayList<>()).add(v);
+              g.computeIfAbsent(v,k-> new ArrayList<>()).add(u);
+        }
+
+        // dfs to find the size
+
+        int rem = n ;
+        long ans = 0;
+        boolean [] vis = new boolean[n];
+        for(int i = 0 ; i < n ; ++i)
+        {
+
+             if(!vis[i]){
+                 size = 0;
+
+                 dfs(i,g,vis);
+                  ans = ans + (size) * (rem - size);
+                 rem-=size;
+             }
+        }
+
+        return ans;
+
+
+    }
+}

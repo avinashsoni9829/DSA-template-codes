@@ -1,0 +1,50 @@
+class Solution {
+
+    private void floydWarshal(long [][] d , char [] s1, char [] s2 , int cost[])
+    {
+         for(int i = 0 ; i < s1.length ; ++i)
+         {
+             int u = s1[i] - 'a';
+             int v = s2[i] - 'a';
+             d[u][v] = Math.min(d[u][v],(long) cost[i]);
+         }
+
+         for(int via = 0 ; via < 26 ; ++via)
+         {
+             for(int i = 0 ; i < 26 ; ++i)
+             {
+                 for(int j = 0 ; j < 26 ; ++j)
+                 {
+                     d[i][j] = Math.min(d[i][j],d[i][via] + d[via][j]);
+                 }
+             }
+         }
+    }
+    public long minimumCost(String source, String target, char[] original, char[] changed, int[] cost) {
+        long [][] d = new long[26][26];
+
+        for(int i = 0 ; i < 26 ; ++i){
+             Arrays.fill(d[i],Integer.MAX_VALUE);
+        }
+
+        floydWarshal(d,original,changed,cost);
+
+        long ans = 0;
+        for(int i = 0 ; i < source.length() ; ++i)
+        {
+             if(source.charAt(i) == target.charAt(i)){
+                continue;
+             }
+
+             if(d[source.charAt(i) - 'a'][target.charAt(i) - 'a'] == Integer.MAX_VALUE)
+             {
+                 return -1;
+             }
+             else{
+                 ans+=d[source.charAt(i) - 'a'][target.charAt(i) - 'a'];
+             }
+        }
+
+        return ans;
+    }
+}

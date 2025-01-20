@@ -1,0 +1,64 @@
+/*
+ We will try to Add Back - Edges so that we can traverse every where
+ now we will identify the nodes whoose actual edges are not towards 0 using our dfs
+ and will give ans
+ Time : O(n)
+ Space : O(n)
+
+*/
+
+class Solution {
+    class Edge {
+        private int dest;
+        private boolean isRealEdge;
+
+        public Edge(int dest){
+             this.dest = dest;
+             this.isRealEdge = false;
+        }
+        public void setReal(){
+            this.isRealEdge = true;
+        }
+
+
+    }
+    int ans = 0;
+
+    private void dfs(int node , int parent , Map<Integer, List<Edge>> g){
+         for(Edge child : g.getOrDefault(node , new ArrayList<>())){
+             if(child.dest == parent) continue;
+             // if its a real edge and going away from 0 [parent] so it means its need
+             // to be flipped
+             if(child.isRealEdge){
+                 ans = ans + 1;
+             }
+             dfs(child.dest,node,g);
+         }
+    }
+    public int minReorder(int n, int[][] connections) {
+        // Graph Creation
+        Map<Integer, List<Edge>> g = new HashMap<>();
+
+        for(int [] c : connections){
+             int u = c[0];
+             int v = c[1];
+
+             // u -> v is real edge
+             // v -> u is our fake edge
+
+             Edge realEdge = new Edge(v);
+             realEdge.setReal();
+
+             Edge fakeEdge = new Edge(u);
+
+             g.computeIfAbsent(u,k-> new ArrayList<>()).add(realEdge);
+             g.computeIfAbsent(v,k -> new ArrayList<>()).add(fakeEdge);
+        }
+
+        // traversal
+
+        dfs(0,-1,g);
+
+        return ans;
+    }
+}

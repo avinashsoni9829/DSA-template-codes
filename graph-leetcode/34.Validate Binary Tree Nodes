@@ -1,0 +1,104 @@
+/*
+ DSU can be used to solve this
+ we will try to club all the childs and in the end if the parent is same
+ for all then we can say that its a binary tree
+
+
+
+*/
+
+
+class Solution {
+
+
+    public class DSU {
+        private int[] parent, rank;
+
+        public DSU(int n) {
+            parent = new int[n];
+            rank = new int[n];
+            for (int i = 0; i < n; i++) {
+                parent[i] = i;
+                rank[i] = 0;
+            }
+        }
+
+        public int find(int x) {
+            if (parent[x] != x) {
+                parent[x] = find(parent[x]); // Path compression
+            }
+            return parent[x];
+        }
+
+        public void union(int x, int y) {
+            int rootX = find(x);
+            int rootY = find(y);
+            if (rootX != rootY) {
+                if (rank[rootX] > rank[rootY]) {
+                    parent[rootY] = rootX;
+                } else if (rank[rootX] < rank[rootY]) {
+                    parent[rootX] = rootY;
+                } else {
+                    parent[rootY] = rootX;
+                    rank[rootX]++;
+                }
+            }
+        }
+    }
+
+    public boolean validateBinaryTreeNodes(int n, int[] leftChild, int[] rightChild) {
+         // Initialize the DSU (Disjoint Set Union)
+    DSU dsu = new DSU(n);
+    int[] indegree = new int[n];
+
+    // Process all edges from leftChild and rightChild arrays
+    for (int i = 0; i < n; i++) {
+        // Check left child
+        if (leftChild[i] != -1) {
+            // Check if it forms a cycle
+            if (dsu.find(i) == dsu.find(leftChild[i])) return false;
+
+            // Union the parent and child
+            dsu.union(i, leftChild[i]);
+
+            // Increase indegree of the left child
+            indegree[leftChild[i]]++;
+            if (indegree[leftChild[i]] > 1) return false; // Multiple parents
+        }
+
+        // Check right child
+        if (rightChild[i] != -1) {
+            // Check if it forms a cycle
+            if (dsu.find(i) == dsu.find(rightChild[i])) return false;
+
+            // Union the parent and child
+            dsu.union(i, rightChild[i]);
+
+            // Increase indegree of the right child
+            indegree[rightChild[i]]++;
+            if (indegree[rightChild[i]] > 1) return false; // Multiple parents
+        }
+    }
+
+    // Verify the root node (indegree of exactly one node must be 0)
+    int rootCount = 0;
+    for (int i = 0; i < n; i++) {
+        if (indegree[i] == 0) rootCount++;
+    }
+
+    // There must be exactly one root and all nodes should be connected
+    return rootCount == 1 && areAllNodesConnected(dsu, n);
+
+
+    }
+    private boolean areAllNodesConnected(DSU dsu, int n) {
+    // Find the parent of the first node
+    int root = dsu.find(0);
+
+    // Ensure all nodes have the same root
+    for (int i = 1; i < n; i++) {
+        if (dsu.find(i) != root) return false;
+    }
+    return true;
+}
+}

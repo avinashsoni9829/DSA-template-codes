@@ -1,0 +1,48 @@
+/*
+Step 1: If Node is Null return null
+Step 2: Create copy of root node
+Step 3 : Create the vis array of node which tells what all nodes are done  intially all Null
+Step 4 : Call DFS
+
+DFS :
+Step 1 : Assign the copied node
+Step 2 : Go to the Neighbours and see if that node is already create or not
+   if not then -> create a new copy of the node and then addd it to the negibours array of the
+   rootCopy
+   then call dfs on child
+   if Yes -> directly add to the neighbours
+*/
+
+class Solution {
+
+    private void dfs(Node original, Node rootCopy , Node [] marked)
+    {
+          marked[rootCopy.val] = rootCopy;
+
+          for(Node n : original.neighbors){
+             if(marked[n.val] == null){
+                 Node newNode = new Node(n.val);
+                 rootCopy.neighbors.add(newNode);
+                 dfs(n,newNode,marked);
+             }
+             else{
+                 rootCopy.neighbors.add(marked[n.val]);
+             }
+          }
+
+    }
+    public Node cloneGraph(Node node) {
+
+        if(node == null) return null;
+
+        Node root = new Node(node.val);
+
+        Node [] vis = new Node[101];
+        Arrays.fill(vis,null);
+
+        dfs(node , root, vis);
+
+        return root;
+
+    }
+}

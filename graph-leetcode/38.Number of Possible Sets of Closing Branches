@@ -1,0 +1,98 @@
+/*
+ We will use bits to represent the set and will use the logic of finding
+ set bit by right shift and 1 logic.
+ using this we can determine if there can be an edge
+ betweenn two nodes
+ now using this we will prepare all the graphs and then find the
+ min distance using the floyd warshall algorithm
+ and then we can check if the distance is less than the maxDistance
+ allowed .
+ TC : O(n^3 * 2 ^n)
+ SC : O(n^2)
+*/
+
+class Solution {
+    private boolean inSet(int shift ,int set){
+         return ( set >> shift & 1) == 1;
+    }
+    public int numberOfSets(int n, int maxDistance, int[][] roads) {
+        int ans = 0 ;
+
+        // for n value there an be 2^n - 1 sets
+        for(int set = 0 ; set < (1 << n) ; ++set)
+        {
+            int [][] g = new int[n][n];
+            // grid for floyd warshal
+
+            for(int i = 0 ; i < n ; ++i)
+            {
+                 for(int j = 0 ; j < n ; ++j)
+                 {
+                     g[i][j] = (int) 1e9;
+                 }
+            }
+
+            // start going through all the edges
+            // and check if the particular edge is
+            // part of the given set or not
+            // using the set bit logic
+
+            for(int [] e : roads)
+            {
+                 int u = e[0];
+                 int v = e[1];
+                 int wt = e[2];
+
+                 if(inSet(u,set) && inSet(v,set))
+                 {
+                     // this means both are part of the set
+                     g[u][v] = Math.min(g[u][v],wt);
+                     g[v][u] = Math.min(g[v][u],wt);
+                 }
+            }
+
+            // now once edge are processed we run floyd
+
+            for(int k = 0 ; k < n ; ++k){
+                 g[k][k] = 0;
+                 // i -> i min distance = 0 ;
+            }
+
+            for(int via = 0 ; via < n ; ++via)
+            {
+                 for(int x = 0 ; x < n ; ++x){
+                     for(int y = 0 ; y < n ; ++y)
+                     {
+                         g[x][y] = Math.min(g[x][y],g[x][via] + g[via][y]);
+                     }
+                 }
+            }
+
+            // now grid is done so we need have a validation
+            // to check if all distances are less than the
+            // maxDistance
+
+            boolean correct = true;
+
+            for(int i = 0 ; i < n ; ++i)
+            {
+                 for(int j = 0 ; j < n ; ++j)
+                 {
+                     if(i == j) continue ;
+
+                     if(inSet(i,set) && inSet(j,set))
+                     {
+                         if(g[i][j] > maxDistance){
+                             correct = false;
+                             break;
+                         }
+                     }
+                 }
+            }
+
+            ans = ans + (correct == true ? 1 : 0);
+        }
+
+        return ans;
+    }
+}

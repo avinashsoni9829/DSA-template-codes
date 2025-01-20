@@ -1,0 +1,104 @@
+/*
+ First Brute Force :
+ 1. Find the Max Value In graph and Between all possible nodes , find the combinations and add to
+ ans and then remove the entry from graph and keep doing this again and again
+
+ 2. Instead of Breaking Down we keep every node seprate and then start construction
+ using DSU type approach
+
+ We will find the Graph List
+ we will find all the value having similar nodes
+ then we start iteratig over each entry and then see if its active in DSU or not
+ if active we connect otherwise we dont.
+
+Time Complexity :
+O(n log n + m)
+Space Complexity :
+O(n + m)
+*/
+
+class Solution {
+    public class DSU {
+        private int[] parent, rank;
+
+        public DSU(int n) {
+            parent = new int[n];
+            rank = new int[n];
+            for (int i = 0; i < n; i++) {
+                parent[i] = i;
+                rank[i] = 0;
+            }
+        }
+
+        public int find(int x) {
+            if (parent[x] != x) {
+                parent[x] = find(parent[x]); // Path compression
+            }
+            return parent[x];
+        }
+
+        public void union(int x, int y) {
+            int rootX = find(x);
+            int rootY = find(y);
+            if (rootX != rootY) {
+                if (rank[rootX] > rank[rootY]) {
+                    parent[rootY] = rootX;
+                } else if (rank[rootX] < rank[rootY]) {
+                    parent[rootX] = rootY;
+                } else {
+                    parent[rootY] = rootX;
+                    rank[rootX]++;
+                }
+            }
+        }
+    }
+
+    public int numberOfGoodPaths(int[] vals, int[][] edges) {
+        int n = vals.length;
+        DSU dsu = new DSU(n);
+
+        // Build adjacency list
+        Map<Integer, List<Integer>> graph = new HashMap<>();
+        for (int[] edge : edges) {
+            graph.computeIfAbsent(edge[0], k -> new ArrayList<>()).add(edge[1]);
+            graph.computeIfAbsent(edge[1], k -> new ArrayList<>()).add(edge[0]);
+        }
+
+        // Group nodes by their values
+        Map<Integer, List<Integer>> valueMap = new TreeMap<>();
+        for (int i = 0; i < n; i++) {
+            valueMap.computeIfAbsent(vals[i], k -> new ArrayList<>()).add(i);
+        }
+
+        boolean[] vis = new boolean[n];
+        int ans = n; // Each node is a "good path" by itself
+
+        for (int value : valueMap.keySet()) {
+            List<Integer> nodes = valueMap.get(value);
+
+            // Activate nodes and connect them in DSU
+            for (int node : nodes) {
+                vis[node] = true;
+                for (int neighbor : graph.getOrDefault(node, new ArrayList<>())) {
+                    if (vis[neighbor]) {
+                        dsu.union(node, neighbor);
+                    }
+                }
+            }
+
+            // Count connected components for this value
+            Map<Integer, Integer> parentCount = new HashMap<>();
+            for (int node : nodes) {
+                int parent = dsu.find(node);
+                parentCount.put(parent, parentCount.getOrDefault(parent, 0) + 1);
+            }
+
+            // Add combinations of "good paths" from connected components
+            for (int count : parentCount.values()) {
+                ans += count * (count - 1) / 2;
+            }
+        }
+
+        return ans;
+    }
+}

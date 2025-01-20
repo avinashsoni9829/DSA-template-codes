@@ -1,0 +1,54 @@
+class Solution {
+    /*
+     DFS / BFS
+    */
+    class Node {
+        int dest;
+        int cost;
+
+        public Node(int dest, int cost) {
+            this.dest = dest;
+            this.cost = cost;
+        }
+    }
+
+    private int dfs(Map<Integer, List<Node>> graph, int node, boolean[] visited, int currentMin) {
+        visited[node] = true;
+
+        for (Node child : graph.getOrDefault(node, new ArrayList<>())) {
+            int nextNode = child.dest;
+            int edgeCost = child.cost;
+
+            // Update the current minimum score
+            currentMin = Math.min(currentMin, edgeCost);
+
+            if (!visited[nextNode]) {
+                currentMin = dfs(graph, nextNode, visited, currentMin);
+            }
+        }
+
+        return currentMin;
+    }
+
+    public int minScore(int n, int[][] roads) {
+        // Build the graph
+        Map<Integer, List<Node>> graph = new HashMap<>();
+        for (int[] road : roads) {
+            int u = road[0];
+            int v = road[1];
+            int wt = road[2];
+
+            // Add edges in both directions
+            graph.computeIfAbsent(u, k -> new ArrayList<>()).add(new Node(v, wt));
+            graph.computeIfAbsent(v, k -> new ArrayList<>()).add(new Node(u, wt));
+        }
+
+        boolean[] visited = new boolean[n + 1];
+        int result = Integer.MAX_VALUE;
+
+        // Start DFS from node 1
+        result = dfs(graph, 1, visited, result);
+
+        return result;
+    }
+}

@@ -1,0 +1,74 @@
+class Solution {
+    public class DSU {
+        private int[] parent, rank;
+
+        public DSU(int n) {
+            parent = new int[n];
+            rank = new int[n];
+            for (int i = 0; i < n; i++) {
+                parent[i] = i;
+                rank[i] = 0;
+            }
+        }
+
+        public int find(int x) {
+            if (parent[x] != x) {
+                parent[x] = find(parent[x]); // Path compression
+            }
+            return parent[x];
+        }
+
+        public void union(int x, int y) {
+            int rootX = find(x);
+            int rootY = find(y);
+            if (rootX != rootY) {
+                if (rank[rootX] > rank[rootY]) {
+                    parent[rootY] = rootX;
+                } else if (rank[rootX] < rank[rootY]) {
+                    parent[rootX] = rootY;
+                } else {
+                    parent[rootY] = rootX;
+                    rank[rootX]++;
+                }
+            }
+        }
+    }
+
+    public boolean canEdge(String s1,String s2){
+         int len1 = s1.length();
+         int len2 = s2.length();
+
+         if(len1!=len2) return false;
+         if(len1 == 0 || len2 == 0) return false;
+
+         int diff = 0 ;
+
+         for(int i = 0 ; i < len1 ; ++i){
+             char c1 = s1.charAt(i);
+             char c2 = s2.charAt(i);
+
+             if(c1!=c2){
+                 diff = diff + 1;
+                 if(diff > 2){
+                     return false;
+                 }
+             }
+           }
+           return diff == 2 || diff == 0 ;
+    }
+
+    public int numSimilarGroups(String[] strs) {
+         int n = strs.length;
+         DSU dsu = new DSU(n);
+         int ans = n;
+         for(int i = 0 ; i < n ; ++i){
+             for(int j = i + 1  ; j < n ; ++j){
+                 if(canEdge(strs[i],strs[j]) && (dsu.find(i)!=dsu.find(j))){
+                     dsu.union(i,j);
+                     ans-=1;
+                 }
+             }
+         }
+         return ans;
+  }
+}

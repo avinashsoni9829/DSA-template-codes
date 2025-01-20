@@ -1,0 +1,86 @@
+/*
+  A / B = 2.0
+  B/ C = 3.0
+
+  A -> B,2
+  B -> C,3
+
+  simlary B -> A , 1/2
+  C -> B , 1/3
+  So using this logic we will create our graph and for any query
+  we will find the DFS from Src = Dest and take mul of all values along the pat
+
+  for cases where nodes are not in the graph itself , we will return -1;
+*/
+
+class Solution {
+    class Edge {
+        private String dest;
+        private double cost;
+
+        public Edge(String d, double c) {
+            dest = d;
+            cost = c;
+        }
+    }
+
+    private boolean dfs(Map<String, List<Edge>> graph, String src, String dest, Set<String> visited, double product, double[] result) {
+        if (!graph.containsKey(src) || !graph.containsKey(dest)) {
+            return false; // Nodes not present in the graph
+        }
+
+        if (src.equals(dest)) {
+            result[0] = product;
+            return true;
+        }
+
+        visited.add(src);
+
+        for (Edge edge : graph.getOrDefault(src, new ArrayList<>())) {
+            if (!visited.contains(edge.dest)) {
+                if (dfs(graph, edge.dest, dest, visited, product * edge.cost, result)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public double[] calcEquation(List<List<String>> equations, double[] values, List<List<String>> queries) {
+        Map<String, List<Edge>> graph = new HashMap<>();
+
+        // Build the graph
+        for (int i = 0; i < equations.size(); ++i) {
+            String u = equations.get(i).get(0);
+            String v = equations.get(i).get(1);
+            double value = values[i];
+
+            graph.computeIfAbsent(u, k -> new ArrayList<>()).add(new Edge(v, value));
+            graph.computeIfAbsent(v, k -> new ArrayList<>()).add(new Edge(u, 1.0 / value));
+        }
+
+        double[] results = new double[queries.size()];
+
+        // Process each query
+        for (int i = 0; i < queries.size(); ++i) {
+            String src = queries.get(i).get(0);
+            String dest = queries.get(i).get(1);
+
+            if (!graph.containsKey(src) || !graph.containsKey(dest)) {
+                results[i] = -1.0;
+            } else {
+                Set<String> visited = new HashSet<>();
+                double[] result = new double[1];
+                result[0] = -1.0;
+                if (dfs(graph, src, dest, visited, 1.0, result)) {
+                    results[i] = result[0];
+                } else {
+                    results[i] = -1.0;
+                }
+            }
+        }
+
+        return results;
+    }
+}

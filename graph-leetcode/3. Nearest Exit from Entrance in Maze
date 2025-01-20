@@ -1,0 +1,95 @@
+class Solution {
+    /*
+       // BFS :
+
+       dx = [1 , -1 , 0 , 0]
+       dy = [0 , 0 , 1 , -1]
+
+       =======================
+
+       q.push(entrance)
+       int steps = 0;
+       level based --> sz --
+       while(!q.isEmpty()){
+         // pop
+
+         if(exit ) -->return
+
+         all 4 directions me jaao.
+         and push
+         }
+
+        last me kuch nahi to return -1;
+
+    */
+    class Cell{
+         private int x;
+         private int y;
+         private char val;
+         public Cell(int x , int y,char v)
+         {
+             this.x = x;
+             this.y = y;
+             this.val = v;
+         }
+    }
+    int [] dx = {1,-1,0,0};
+    int [] dy = {0,0,1,-1};
+    public int nearestExit(char[][] maze, int[] entrance) {
+        int n = maze.length;
+        int m = maze[0].length;
+
+
+        int e_x = entrance[0];
+        int e_y = entrance[1];
+
+        Queue<Cell> q = new LinkedList<>();
+
+        Cell entry = new Cell(e_x,e_y,'.');
+
+        q.offer(entry);
+        maze[e_x][e_y] = '+'; // to mark as visited
+        int steps = 0;
+        while(!q.isEmpty()){
+             int sz = q.size();
+
+             while(sz-- > 0)
+             {
+                 Cell top = q.poll();
+                 int x = top.x;
+                 int y = top.y;
+                 char val = top.val;
+                 // if at boundary and exit found
+                 if( (x == 0 || x == n - 1 || y == 0 || y == m - 1) && !top.equals(entry))
+                 {
+                     return steps;
+                 }
+
+                 // move in all 4 directions and add to queue
+
+                 for(int k = 0 ; k < 4 ; ++k)
+                 {
+                     int nx = x + dx[k];
+                     int ny = y + dy[k];
+
+                     if(nx >= 0 && nx < n && ny>=0 && ny < m && maze[nx][ny]!='+')
+                     {
+                        Cell nw = new Cell(nx,ny,'.');
+                        q.offer(nw);
+                        maze[nx][ny] = '+';
+                     }
+                 }
+
+
+
+             }
+
+             steps = steps + 1;
+
+
+        }
+
+        return -1;
+
+    }
+}

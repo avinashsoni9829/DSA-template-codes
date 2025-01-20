@@ -1,0 +1,47 @@
+class Solution {
+
+    /*
+
+      Case 1 :  Parent -> child -> subtre [apples]  = time for child + 2
+      Case 2 : Parent -> child [apple] -> subtree [no apples] = + 2
+      Case 3 : child [no apple] and subtree no apple = +0
+
+       Time Complexity : O(n)
+       Space Complexity : O(n)
+
+    */
+    private int dfs(Map<Integer,List<Integer>> g, List<Boolean> hasApple , int node , int parent)
+    {
+        // intialize timer = 0
+         int timeTaken = 0;
+
+          // go to all child
+         for(int c : g.getOrDefault(node,new ArrayList<>())){
+            // child cannot be parent
+             if(c == parent) continue;
+
+             // get time from child subtree
+             int timeFromChild = dfs(g,hasApple,c,node);
+             // if child itself has apples then add 2 for that as well
+             if(timeFromChild > 0 || hasApple.get(c) == true){
+                // time from child + if apple there
+                 timeTaken+=timeFromChild+ 2;
+             }
+         }
+
+         return timeTaken;
+    }
+    public int minTime(int n, int[][] edges, List<Boolean> hasApple) {
+      Map<Integer,List<Integer>> g = new HashMap<>();
+
+      for(int [] e : edges){
+         int u = e[0];
+         int v = e[1];
+         g.computeIfAbsent(u,k -> new ArrayList<>()).add(v);
+          g.computeIfAbsent(v,k -> new ArrayList<>()).add(u);
+      }
+
+      return dfs(g, hasApple, 0 , -1);
+    }
+}
+}

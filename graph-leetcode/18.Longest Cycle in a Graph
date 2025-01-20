@@ -1,0 +1,56 @@
+/*
+  We need to track
+  1. Count
+  2. In Recursion
+  3. Visited
+  using this whenever cycle is detected we find the size of the cycle and find the mx one
+
+  Whenever cycle is detected our length will be
+  count[parent] - count[child] + 1;
+  Time : O(n)
+  Space: O(n)
+*/
+
+class Solution {
+    int mxLength = -1;
+
+    private void dfs(int node, int [] edges , List<Integer> count , boolean [] vis , boolean [] inRecursion)
+    {
+        if(node!=-1)
+        {
+           vis[node] = true;
+           inRecursion[node] = true;
+
+           int dest = edges[node];
+
+            if(dest!= -1 && !vis[dest] ){
+                 count.set(dest,count.get(node) + 1);
+                 dfs(dest,edges,count,vis,inRecursion);
+            }
+            else if(dest!=-1 && inRecursion[dest] == true){
+                 // cycle found
+                 mxLength = Math.max(mxLength, count.get(node) - count.get(dest) + 1);
+
+            }
+
+            // mark inrecursion false
+            inRecursion[node] = false;
+        }
+
+    }
+    public int longestCycle(int[] edges) {
+       int n = edges.length;
+       List<Integer> count = new ArrayList<>(Collections.nCopies(n,1));
+       boolean [] vis = new boolean[n];
+       boolean [] inRecursion = new boolean[n];
+       // traversal
+       for(int i = 0 ; i < n ; ++i)
+       {
+          if(!vis[i]){
+             dfs(i,edges,count,vis,inRecursion);
+          }
+       }
+
+       return mxLength;
+    }
+}
