@@ -1,0 +1,47 @@
+
+
+class Solution {
+    public int lowerBound(int low, int high, int[] a, long t) {
+        int lbIdx = -1;
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+            if (a[mid] >= t) {
+                lbIdx = mid;
+                high = mid - 1;
+            } else {
+                low = mid + 1;
+            }
+        }
+        return lbIdx == -1 ? a.length : lbIdx; // Ensure valid index if no element satisfies the condition
+    }
+
+    public int[] successfulPairs(int[] spells, int[] potions, long success) {
+        int n = spells.length;
+        int m = potions.length;
+
+        // Sort the potions array
+        Arrays.sort(potions);
+
+        int maxPotion = potions[m - 1];
+        int[] ans = new int[n];
+
+        for (int i = 0; i < n; ++i) {
+            int spell = spells[i];
+
+
+            long minReq = (long) Math.ceil((1.0 * success) / spell);
+            if (minReq > maxPotion) {
+                ans[i] = 0; // No valid pairs
+                continue;
+            }
+
+
+            int lb = lowerBound(0, m - 1, potions, minReq);
+
+
+            ans[i] = m - lb;
+        }
+
+        return ans;
+    }
+}

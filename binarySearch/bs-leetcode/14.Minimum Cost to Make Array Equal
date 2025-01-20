@@ -1,0 +1,42 @@
+class Solution {
+    public long findCost(int t , int [] nums , int [] cost)
+    {
+         long costHere = 0;
+         for(int i = 0 ; i < nums.length ; ++i)
+         {
+              long d = (long) Math.abs(nums[i] - t) * cost[i];
+              costHere+=d;
+         }
+
+        return costHere;
+    }
+    public long minCost(int[] nums, int[] cost) {
+        int n = nums.length;
+        int m = cost.length ;
+
+        int mx = Arrays.stream(nums).max().orElse(Integer.MIN_VALUE);
+
+        int l = 0 , r = mx;
+        long ans = Long.MAX_VALUE;
+        while(l<=r)
+        {
+             int mid = l + (r - l)/2;
+            // Mid aur Mid + 1 pe cost nikal ke direction pata kar lo kaha jaana
+
+             long costAtMid = findCost(mid,nums,cost);
+             long costAtMidPlusOne = findCost(mid + 1, nums, cost);
+
+             ans = Math.min(ans,Math.min(costAtMid,costAtMidPlusOne));
+             if(costAtMidPlusOne < costAtMid)
+             {
+
+                  l = mid + 1;
+             }
+             else{
+                  r = mid - 1;
+             }
+        }
+
+        return ans;
+    }
+}

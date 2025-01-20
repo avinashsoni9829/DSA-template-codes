@@ -1,0 +1,67 @@
+class Solution {
+
+    int rightMost(int [] nums , int target)
+    {
+         int l = 0 , h = nums.length -1;
+         int ans = -1;
+
+         while(l <= h)
+         {
+              int m = l + (h - l)/2;
+              if(nums[m] == target){
+                   ans = m; // this can be the answer
+                   l = m + 1; // search in right now
+              }
+              else if(nums[m] < target)
+              {
+                   l = m + 1;
+              }
+              else {
+                   h = m - 1;
+              }
+         }
+
+        return ans;
+
+    }
+
+    int leftMost(int [] nums , int target)
+    {
+         int l = 0 , h = nums.length -1;
+         int ans = -1;
+
+         while(l <= h)
+         {
+              int m = l + (h - l)/2;
+              if(nums[m] == target){
+                   ans = m; // this can be the answer
+                   h = m - 1; // search in left from here if something is find
+              }
+              else if(nums[m] < target)
+              {
+                   l = m + 1;
+              }
+              else {
+                   h = m - 1;
+              }
+         }
+
+        return ans;
+
+    }
+
+
+
+
+
+
+    public int[] searchRange(int[] nums, int target) {
+
+        int ans[] = new int[2];
+        ans[0] = leftMost(nums,target);
+        ans[1] = rightMost(nums,target);
+
+        return ans;
+
+    }
+}

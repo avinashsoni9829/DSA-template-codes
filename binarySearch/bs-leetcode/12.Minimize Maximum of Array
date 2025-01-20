@@ -1,0 +1,39 @@
+class Solution {
+    boolean bsOnAns(int [] nums , long t , int n)
+    {
+      long[] temp = Arrays.stream(nums).asLongStream().toArray();
+      //  System.out.println("t = " + t);
+         for(int i = 0 ; i < n - 1 ; ++i)
+         {
+              if(temp[i] > t) return false; // cannot go below this
+
+             // System.out.println(" val  = " + temp[i]);
+              long extra = t - temp[i];
+
+              // bring the other to approprate value so that prev is maintained
+
+              temp[i + 1] = temp[i + 1] - extra;
+         }
+
+         return temp[n - 1] <= t;  // all values should be less than t
+    }
+    public int minimizeArrayValue(int[] nums) {
+        int n = nums.length;
+        long l = nums[0] , r = Arrays.stream(nums).max().orElse(Integer.MIN_VALUE) ;
+        long ans = -1;
+        while(l <= r){
+             long m = l + (r - l)/2;
+             if(bsOnAns(nums,m,n))
+             {
+                  ans = m;
+                  r = m - 1;
+             }
+            else{
+                 l = m + 1;
+            }
+
+        }
+
+        return (int)ans;
+    }
+}

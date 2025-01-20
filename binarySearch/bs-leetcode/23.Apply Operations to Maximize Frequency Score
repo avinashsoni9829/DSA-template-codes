@@ -1,0 +1,81 @@
+
+
+
+class Solution {
+     // we want ki we are able to conver the nums to t freq having same value
+         // 1 2 3 isme hum middle element ko target karege banane ke lie
+
+         /* now for ex  : 1  2  3 4 5
+         and humara window  2 3 4
+         and target = 3
+         to sum before i = prefix[i - 1]
+         sum upto idx = prefix[idx - 1] - prefix [i - 1]
+         // num of elements. = idx - i
+         // req sum = ( idx - i ) * target
+         and diff = no of operations
+         same element ka 0 operations then we find the remaining element sum
+         */
+
+    private boolean isPossible(int len, int[] nums, long[] prefix, long k, int n) {
+         // base case
+        if (len == 0) {
+            return false;
+        }
+
+        int start = 0;
+        int end = len - 1;
+ // hum window shift krte rahege untill all processed or true found
+        while (end < n) {
+            int idx = (start + end) / 2;
+            long target = nums[idx];
+
+            long operationsLeft = 0;
+            long operationsRight = 0;
+
+            if (idx > 0) {
+                // we want (idx - start) elements to t sized [whole window] so we need this sum
+                long requiredLeftSum = (idx - start) * target;
+                long leftSum = prefix[idx - 1] - (start > 0 ? prefix[start - 1] : 0);
+                operationsLeft = requiredLeftSum - leftSum;
+            }
+
+            long requiredRightSum = (end - idx) * target;
+            long rightSum = prefix[end] - prefix[idx];
+            operationsRight = requiredRightSum - rightSum;
+
+            if (operationsLeft + operationsRight <= k) {
+                return true;
+            }
+
+            start++;
+            end++;
+        }
+
+        return false;
+    }
+
+    public int maxFrequencyScore(int[] nums, long k) {
+        int n = nums.length;
+        Arrays.sort(nums);
+
+        long[] prefix = new long[n];
+        prefix[0] = nums[0];
+        for (int i = 1; i < n; i++) {
+            prefix[i] = prefix[i - 1] + nums[i];
+        }
+
+        int low = 1, high = n, result = 1;
+
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+            if (isPossible(mid, nums, prefix, k, n)) {
+                result = mid;
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+
+        return result;
+    }
+}

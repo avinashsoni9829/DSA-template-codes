@@ -1,0 +1,21 @@
+class Solution {
+    public int specialArray(int[] nums) {
+        int n = nums.length;
+        int [] f = new int [n + 1];
+
+        for(int i = 0 ; i < n ; ++i)
+        {
+             f[Math.min(n , nums[i])]++;
+        }
+
+        int ans = 0;
+        for(int i = n ; i>= 1 ; i--)
+        {
+             ans = ans + f[i];
+             if(i == ans) return i;
+
+        }
+
+        return -1;
+    }
+}

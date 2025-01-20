@@ -1,0 +1,34 @@
+
+
+class Solution {
+     boolean possible(int[] batteries, long midTime, int n, long totalSum) {
+            return totalSum >= n * midTime;
+      }
+    public long maxRunTime(int n, int[] batteries) {
+        // Helper function to check if it's possible to run n computers for `midTime` minutes
+
+        long totalSum = (long) Intstream.of(batteries).sum();
+        long totalMinutes = 0;
+        for (int battery : batteries) {
+            totalMinutes += battery;
+        }
+
+        long left = Arrays.stream(batteries).min().getAsInt();
+        long right = totalMinutes / n;
+        long result = 0;
+
+        // Binary search on the possible runtime
+        while (left <= right) {
+            long midTime = left + (right - left) / 2;
+
+            if (possible(batteries, midTime, n,totalSum)) {
+                result = midTime;
+                left = midTime + 1; // Try for a longer runtime
+            } else {
+                right = midTime - 1; // Reduce runtime
+            }
+        }
+
+        return result;
+    }
+}

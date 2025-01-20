@@ -1,0 +1,49 @@
+class Solution {
+    public int longestOnes(int[] nums, int k) {
+        int n = nums.length;
+        int ans = 0;
+        int zeroPointer = -1;
+
+        int currZerosEncounterd = 0;
+
+        for(int i = 0 ; i < n ; ++i)
+        {
+             if(nums[i] == 0){
+                  currZerosEncounterd = currZerosEncounterd + 1;
+             }
+
+             while(currZerosEncounterd > k)
+             {
+                  zeroPointer = zeroPointer + 1;
+                  if(nums[zeroPointer] == 0) currZerosEncounterd --;
+             }
+             ans = Math.max(ans,i - zeroPointer);
+        }
+           return ans;
+
+       }
+    /*
+    Jab tak k zeros na aaye we iterate
+    once got we move to first zero and from there we start again
+
+    1 1 0 1 0 0 1 1 0 1 0 1 1
+
+    K  = 2
+    1 1 0 1 0 --> len = 5
+          1 0 0 --> len = 3
+           0 1 1 0 --> len = 4
+
+           1 1 0 1 0 1 1 --> len = 7
+
+============================================
+    1 1 1 0 0 0 1 1 1 1 1 0
+
+    1 1 1 0 0 --> len = 5
+    0 0 --> len = 2
+    0 0 --> len = 2
+    0 1 1 1 1 0 --> len = 6
+    ans = 6
+
+
+    */
+}

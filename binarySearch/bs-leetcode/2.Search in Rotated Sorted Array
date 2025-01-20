@@ -1,0 +1,99 @@
+Approach - 1 :
+
+class Solution {
+    public int findMinIndex(int [] nums){
+         int n = nums.length;
+         int ans = Integer.MAX_VALUE;
+         int minIdx = -1;
+         int l = 0 , r = n - 1;
+         while(l<=r)
+         {
+              int m = l + (r - l)/2;
+              if(nums[m] > nums[r]){
+                   l = m + 1;
+              }
+              else{
+                   if(nums[m] < ans)
+                   {
+                        ans = nums[m];
+                        minIdx = m;
+                   }
+                   r = m - 1;
+
+              }
+         }
+
+        return minIdx == -1 ? 0 : minIdx;
+    }
+
+    public int binarySearch(int nums[] , int l , int h , int target)
+    {
+         //System.out.println("low = " + l + "high = " + h);
+         while(l<=h)
+         {
+              int m = l + (h - l)/2;
+              if(nums[m] == target) return m;
+              if(nums[m] > target) h = m - 1;
+              else {
+                   l = m + 1;
+              }
+
+         }
+
+        return -1;
+    }
+
+    public int search(int[] nums, int target) {
+
+          int minIdx = findMinIndex(nums);
+          //System.out.println(minIdx);
+          int bs1 = binarySearch(nums,0,minIdx,target);
+          int bs2 = binarySearch(nums,minIdx,nums.length - 1,target);
+
+          if(bs1 == -1 && bs2 == -1) return -1;
+          if(bs1 == -1) return bs2;
+          return bs1;
+    }
+}
+
+
+Approach - 2 :
+class Solution {
+    public int search(int[] nums, int target) {
+        int n = nums.length;
+        int low = 0 , high = n - 1;
+
+        while(low <= high)
+        {
+             int mid = low + (high - low)/2;
+
+             if(nums[mid] == target) return mid;
+
+             if(nums[low] <= nums[mid])
+             {
+                  if(target >= nums[low] && target <= nums[mid])
+                  {
+                       high = mid - 1;
+                  }
+                 else{
+                      low = mid + 1;
+                 }
+             }
+            else
+            {
+                 if(target >= nums[mid + 1] && target <= nums[high])
+                 {
+                      low = mid + 1;
+                 }
+                else{
+                     high = mid - 1;
+                }
+
+            }
+         }
+
+        return -1;
+    }
+}
+
+
