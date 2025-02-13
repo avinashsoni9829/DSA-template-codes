@@ -1,0 +1,46 @@
+import java.util.*;
+
+public class KefaAndPark {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int n = scanner.nextInt();
+        int m = scanner.nextInt();
+
+        int[] cats = new int[n + 1]; // 1-based indexing
+        for (int i = 1; i <= n; ++i) {
+            cats[i] = scanner.nextInt();
+        }
+
+        // Graph representation using adjacency list
+        List<List<Integer>> graph = new ArrayList<>(n + 1);
+        for (int i = 0; i <= n; ++i) {
+            graph.add(new ArrayList<>());
+        }
+
+        for (int i = 0; i < n - 1; ++i) {
+            int u = scanner.nextInt();
+            int v = scanner.nextInt();
+            graph.get(u).add(v);
+            graph.get(v).add(u);
+        }
+
+        System.out.println(dfs(graph, cats, 1, -1, cats[1], m));
+    }
+
+    private static int dfs(List<List<Integer>> graph, int[] cats, int node, int parent, int catCount, int maxAllowed) {
+        if (catCount > maxAllowed) return 0; // Stop recursion early if limit exceeded
+
+        boolean isLeaf = true;
+        int count = 0;
+
+        for (int child : graph.get(node)) {
+            if (child != parent) {
+                isLeaf = false;
+                int newCatCount = (cats[child] == 1) ? catCount + 1 : 0;
+                count += dfs(graph, cats, child, node, newCatCount, maxAllowed);
+            }
+        }
+
+        return isLeaf ? 1 : count; // Count only valid leaf nodes
+    }
+}

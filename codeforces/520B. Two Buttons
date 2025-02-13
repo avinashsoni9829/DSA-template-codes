@@ -1,0 +1,41 @@
+import java.util.*;
+
+public class Solution {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int n = scanner.nextInt();
+        int m = scanner.nextInt();
+
+        System.out.println(minOperations(n, m));
+    }
+
+    private static int minOperations(int n, int m) {
+        if (n >= m) return n - m; // Direct decrements when n > m
+
+        Queue<Integer> q = new LinkedList<>();
+        Map<Integer, Integer> dist = new HashMap<>(); // Distance from `n`
+
+        q.offer(n);
+        dist.put(n, 0);
+
+        while (!q.isEmpty()) {
+            int curr = q.poll();
+            int steps = dist.get(curr);
+
+            if (curr == m) return steps;
+
+            // Try multiplying by 2
+            if (curr * 2 <= 2 * m && !dist.containsKey(curr * 2)) {
+                dist.put(curr * 2, steps + 1);
+                q.offer(curr * 2);
+            }
+
+            // Try subtracting 1
+            if (curr - 1 > 0 && !dist.containsKey(curr - 1)) {
+                dist.put(curr - 1, steps + 1);
+                q.offer(curr - 1);
+            }
+        }
+        return -1;
+    }
+}
