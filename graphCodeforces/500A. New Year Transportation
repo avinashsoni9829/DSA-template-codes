@@ -1,0 +1,42 @@
+import java.util.*;
+
+public class Solution {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int n = scanner.nextInt();
+        int t = scanner.nextInt();
+
+        int [] portals = new int[n - 1];
+
+        for(int i = 0  ; i < n - 1 ; ++i){
+             portals[i] = scanner.nextInt();
+        }
+
+        // creating the graph
+        Map<Integer, List<Integer>> g = new HashMap<>();
+        for(int i = 1 ; i < n ; ++i){
+             g.computeIfAbsent(i,k-> new ArrayList<>()).add(portals[i - 1] + i);
+        }
+
+        boolean[] vis = new boolean[n + 1];
+        System.out.println(dfs(g,t,1,vis) ? "YES" : "NO");
+    }
+
+    private static boolean dfs(Map<Integer, List<Integer>> g, int target, int src, boolean[] vis) {
+        if(src == target)return  true;
+        vis[src] = true;
+        for(int child : g.getOrDefault(src,new ArrayList<>())){
+             if(!vis[child] &&  dfs(g,target,child,vis)){
+                 return true;
+
+             }
+        }
+
+        return false;
+
+
+    }
+
+
+}
+
